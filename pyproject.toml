@@ -1,0 +1,27 @@
+[project]
+name = "wikisearch"
+version = "0.1.0"
+description = "search wikipedia via local zim files"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.116.1",
+    "httpx>=0.28.1",
+    "libzim>=3.7.0",
+    "markitdown>=0.1.2",
+    "mcp>=1.12.4",
+    "mcp-server>=0.1.4",
+    "python-dotenv>=1.1.1",
+    "requests>=2.32.4",
+    "uvicorn>=0.35.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"] 
+
+[tool.setuptools.package-dir]
+"" = "src" 
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
