@@ -15,12 +15,13 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 # 定义要下载的文件模式 (使用正则表达式)
 # 匹配英文和中文的 all_maxi, all_nopic, top_maxi
 patterns = [
+    r"wikipedia_en_100_nopic_(\d{4}-\d{2})\.zim",
     # r"wikipedia_en_all_maxi_(\d{4}-\d{2})\.zim",
     # r"wikipedia_en_all_nopic_(\d{4}-\d{2})\.zim",
     # r"wikipedia_en_top_maxi_(\d{4}-\d{2})\.zim",
     # r"wikipedia_zh_all_maxi_(\d{4}-\d{2})\.zim",
     # r"wikipedia_zh_all_nopic_(\d{4}-\d{2})\.zim",
-    r"wikipedia_zh_top_maxi_(\d{4}-\d{2})\.zim",
+    # r"wikipedia_zh_top_maxi_(\d{4}-\d{2})\.zim",
     
 ]
 

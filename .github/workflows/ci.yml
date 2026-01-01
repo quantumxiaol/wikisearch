@@ -1,0 +1,80 @@
+name: WikiSearch CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+
+      - name: Setup virtual environment
+        run: |
+          uv venv --python 3.12
+          source .venv/bin/activate
+
+      - name: Install dependencies
+        run: |
+          source .venv/bin/activate
+          uv sync
+
+      - name: Download ZIM file
+        run: |
+          source .venv/bin/activate
+          python download_zim.py
+
+      - name: Generate .env from template
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          template = Path(".env.template").read_text(encoding="utf-8")
+          download_dir = Path("wiki_zim_downloads")
+          pattern = re.compile(r"wikipedia_en_100_nopic_\\d{4}-\\d{2}\\.zim")
+          candidates = sorted(
+              p.name for p in download_dir.glob("wikipedia_en_100_nopic_*.zim")
+              if pattern.fullmatch(p.name)
+          )
+          if not candidates:
+              raise SystemExit("No wikipedia_en_100_nopic ZIM file found.")
+          zim_path = str(download_dir / candidates[-1])
+
+          lines = []
+          for line in template.splitlines():
+              if line.startswith("ZIM_FILE_PATH="):
+                  lines.append(f'ZIM_FILE_PATH="{zim_path}"')
+              else:
+                  lines.append(line)
+          Path(".env").write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+          print(f"ZIM_FILE_PATH set to {zim_path}")
+          PY
+
+      - name: Start FastAPI server
+        run: |
+          source .venv/bin/activate
+          nohup python -m wikisearch.server fastapi > fastapi.log 2>&1 &
+          sleep 10
+
+      - name: Start MCP server
+        run: |
+          source .venv/bin/activate
+          nohup python -m wikisearch.server mcp --http > mcp.log 2>&1 &
+          sleep 10
+
+      - name: Run pytest
+        env:
+          WIKI_API_URL: http://127.0.0.1:8080
+          MCP_URL: http://127.0.0.1:8089/mcp/
+        run: |
+          source .venv/bin/activate
+          pytest -q

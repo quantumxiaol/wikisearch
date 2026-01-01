@@ -73,6 +73,48 @@ python -m wikisearch.server mcp --http
 
 SERVER_HOST在.env中定义。
 
+## FastAPI API
+
+FastAPI 提供的查询/信息接口如下：
+
+- `GET /`：服务信息与可用端点
+- `GET /search/html?query=关键词&index=0`：返回原始 HTML 内容
+- `GET /search/markdown?query=关键词&index=0`：返回 Markdown 内容
+- `GET /metadata`：已加载 ZIM 元数据
+- `GET /zim-files`：已加载 ZIM 文件列表
+
+示例：
+```bash
+curl -G "http://127.0.0.1:8080/search/markdown" \
+  --data-urlencode "query=维基百科" \
+  --data-urlencode "index=0"
+```
+
+## Test
+先启动 FastAPI/MCP 服务，再运行测试或手动验证接口。
+
+FastAPI 接口自检（推荐）：
+```bash
+curl -G "http://127.0.0.1:8080/search/markdown" \
+  --data-urlencode "query=维基百科" \
+  --data-urlencode "index=0"
+```
+
+Pytest（仅 tests/）：
+```bash
+pytest
+```
+
+FastAPI 测试：
+```bash
+python tests/test_wiki_api.py
+```
+
+MCP 工具测试：
+```bash
+python tests/test_mcp_tool.py
+```
+
 
 ## Wikipedia ZIM
 [ZIM download](https://download.kiwix.org/zim/wikipedia/)
