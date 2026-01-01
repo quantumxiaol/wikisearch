@@ -40,11 +40,13 @@ jobs:
 
           template = Path(".env.template").read_text(encoding="utf-8")
           download_dir = Path("wiki_zim_downloads")
-          pattern = re.compile(r"wikipedia_en_100_nopic_\\d{4}-\\d{2}\\.zim")
-          candidates = sorted(
-              p.name for p in download_dir.glob("wikipedia_en_100_nopic_*.zim")
-              if pattern.fullmatch(p.name)
-          )
+          pattern = re.compile(r"wikipedia[ _]en[ _]100[ _]nopic[ _]\d{4}-\d{2}\.zim", re.IGNORECASE)
+          candidates = []
+          for path in download_dir.glob("*.zim"):
+              normalized = path.name.replace("%20", " ")
+              if pattern.fullmatch(normalized):
+                  candidates.append(path.name)
+          candidates.sort()
           if not candidates:
               raise SystemExit("No wikipedia_en_100_nopic ZIM file found.")
           zim_path = str(download_dir / candidates[-1])
